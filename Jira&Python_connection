@@ -1,0 +1,101 @@
+from jira import JIRA
+from datetime import date
+from datetime import timedelta
+from datetime import datetime
+from slacker import Slacker
+import websocket
+
+# Main Start #
+if __name__ == '__main__':
+    # my jira id/ pasword / server        
+    user        = '지라 접근 아이디 입력'
+    apikey      = '지라 Token api 입력'
+    server      = '지라 서버 URL'
+
+    # my slack Token
+    slack_Token = 'xoxp-51424831237-518979181813-585781502903-7a44c898e00462784d0ebe1f14e64214'
+
+    # jira connction
+    options     = {'server' : server}
+    jira        = JIRA(options, basic_auth=(user,apikey))
+
+    # slack channel, # channel setting '#channel'
+    slack       = Slacker(slack_Token)
+
+# search data function
+def select_Data():
+
+    # today #
+    current_day = date.today().isoformat()
+
+    # yesterday #
+    yester_day = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+
+    # current all issue jql
+    All_Query = "project = QA AND issuetype = '오류 / 버그' AND created >=" + yester_day + " AND created <=" + current_day + " ORDER BY priority DESC, updated DESC"
+    print(All_Query)
+    # current AOS issue jql
+    #AOS_Query = "project = QA AND issuetype = '오류 / 버그' AND component = AOS AND created >=" + yester_day + " AND created <=" + current_day + " ORDER BY priority DESC, updated DESC"
+    
+    # current IOS issue jql
+    #IOS_Query = "project = QA AND issuetype = '오류 / 버그' AND component = IOS AND created >=" + yester_day + " AND created <=" + current_day + " ORDER BY priority DESC, updated DESC"
+    
+    # current NOT IOS/ AOS jql
+    #NOT_Query = "project = QA AND issuetype = '오류 / 버그' AND component not in (AOS, IOS) AND created >=" + yester_day + " AND created <=" + current_day + " ORDER BY priority DESC, updated DESC"
+    
+    temp_list = [All_Query]
+        
+    return temp_list
+
+# search jira function
+def serach_jira(JSQL_Data):
+
+    temp_list = []
+    
+    Query = JSQL_Data
+
+    length = len(Query)
+
+    for search_query in Query:
+        
+        # View current all issue list #
+        Current_Search_Result = jira.search_issues(search_query)
+
+    temp_list.append(Current_Search_Result)
+
+    return temp_list
+
+# slack alarm
+def slack_alarm(Result):
+
+    # total_Result =   []
+    # AOS_Result   =   []
+    # IOS_Result   =   []
+    # NOT_Result   =   []
+    
+    if not Result:
+        Result_length = len(Result)
+        slack.chat.post_message('#python_alarmtest', '총 등록건수 는' +Result_length() + '입니다.')
+
+        for listing in Result:
+            slack.chat.post_message('#python_alarmtest', listing ,listing.fields.summary)
+
+        #slack.chat.post_message('#python_alarmtest', 'AOS 는')
+        #slack.chat.post_message('#python_alarmtest', 'IOS 는')
+        #slack.chat.post_message('#python_alarmtest', '그 밖에는')
+
+    else:
+        slack.chat.post_message('python_alarmtest', '오늘 이슈로 등록된 것이 한 건도 없습니다')
+
+#=========================================================================================================
+
+# Step1. call select_Date Function
+JSQL_Data = select_Data()
+
+# Step2. call search_jira Function
+Result =serach_jira(JSQL_Data)
+
+# Step3. call slack alarm
+slack_alarm(Result)
+
+#=========================================================================================================
