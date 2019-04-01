@@ -13,7 +13,7 @@ if __name__ == '__main__':
     server      = '지라 서버 URL'
 
     # my slack Token
-    slack_Token = 'xoxp-51424831237-518979181813-585781502903-7a44c898e00462784d0ebe1f14e64214'
+    slack_Token = '슬랙 접근 Token api'
 
     # jira connction
     options     = {'server' : server}
