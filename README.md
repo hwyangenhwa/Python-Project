@@ -1,6 +1,6 @@
 # Python-Project
 
-[현재 구현된 기능[Updated : 2019년 4월 1일]]
+[Updated : 2019년 4월 1일]]
 
 - 지라 JQL코드를 통하여 금일 이슈로 등록된 것들을 가지고 옴 
 (* JQL 변경을 통해 다른 것들을 가지고 올 수 있음)
@@ -14,7 +14,13 @@
 
 (외부 모듈)
 
-JIRA : JIRA 접근 및 JQL을 사용하기 위한 모듈
-[설치방법 : pip install JIRA or pycharm plugin을 통한 검색 후 적용]
-Slacker : slack 알림을 사용하기 위한 모듈
-[설치방법 : pip install slacker or pycharm plugin을 통함 검색 후 적용
+- JIRA : JIRA 접근 및 JQL을 사용하기 위한 모듈
+ : [설치방법 : pip install JIRA or pycharm plugin을 통한 검색 후 적용]
+- Slacker : slack 알림을 사용하기 위한 모듈
+: [설치방법 : pip install slacker or pycharm plugin을 통함 검색 후 적용
+
+[Updated : 2019년 4월 3일]
+
+- 지라 접근 관련 try catch 구문 입력
+- 쿼리 구문 고도화 및 각 항목별 parsing 을 통한 이슈값 내용 정리
+- 텔레그램 관련 알람 메시지 내용 추가
