@@ -1,101 +1,98 @@
-from jira import JIRA
+from jira import JIRA, JIRAError
 from datetime import date
 from datetime import timedelta
 from datetime import datetime
 from slacker import Slacker
-import websocket
+import sys
 
-# Main Start #
-if __name__ == '__main__':
-    # my jira id/ pasword / server        
-    user        = '지라 접근 아이디 입력'
-    apikey      = '지라 Token api 입력'
-    server      = '지라 서버 URL'
 
-    # my slack Token
-    slack_Token = '슬랙 접근 Token api'
+# search jira function #
+def jira_Conn_Search():
+
+    # jira id/ pasword / server
+    user                = 'jira ID'
+    apikey              = 'jira API Key'
+    server              = 'jira server
+
+    # issue & issue Count variable
+    temp_list           = []
+    temp_list_Count     = []
+
+    # call select_Data Function
+    Query_Data          = select_Data()
 
     # jira connction
-    options     = {'server' : server}
-    jira        = JIRA(options, basic_auth=(user,apikey))
+    try:
 
-    # slack channel, # channel setting '#channel'
-    slack       = Slacker(slack_Token)
+        options         = {'server': server}
+        jira            = JIRA(options, basic_auth=(user, apikey))
+
+        for search_query in Query_Data:
+
+            Current_Search_Result = jira.search_issues(search_query)
+            # Check Count current issue list
+            temp_list_Count.append(len(Current_Search_Result))
+            # Check current issue list
+            temp_list.append(Current_Search_Result)
+
+        return temp_list
+
+    except JIRAError as e:
+
+        print(e.status_code, e.text)
+        sys.exit(1)
 
 # search data function
 def select_Data():
 
-    # today #
-    current_day = date.today().isoformat()
+    # Today
+    current_day         = date.today().isoformat()
+    # Yesterday
+    yester_day          = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
 
-    # yesterday #
-    yester_day = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+    # JSQL Query
 
-    # current all issue jql
-    All_Query = "project = QA AND issuetype = '오류 / 버그' AND created >=" + yester_day + " AND created <=" + current_day + " ORDER BY priority DESC, updated DESC"
-    print(All_Query)
-    # current AOS issue jql
-    #AOS_Query = "project = QA AND issuetype = '오류 / 버그' AND component = AOS AND created >=" + yester_day + " AND created <=" + current_day + " ORDER BY priority DESC, updated DESC"
-    
-    # current IOS issue jql
-    #IOS_Query = "project = QA AND issuetype = '오류 / 버그' AND component = IOS AND created >=" + yester_day + " AND created <=" + current_day + " ORDER BY priority DESC, updated DESC"
-    
-    # current NOT IOS/ AOS jql
-    #NOT_Query = "project = QA AND issuetype = '오류 / 버그' AND component not in (AOS, IOS) AND created >=" + yester_day + " AND created <=" + current_day + " ORDER BY priority DESC, updated DESC"
-    
-    temp_list = [All_Query]
-        
-    return temp_list
+    # Current all issue jql
+    All_Query           = "project = QA AND issuetype = '오류 / 버그' AND created >=" + yester_day + " AND created <=" + current_day + " ORDER BY priority DESC, updated DESC"
+    # Current AOS issue jql
+    AOS_Query           = "project = QA AND issuetype = '오류 / 버그' AND component = AOS AND created >=" + yester_day + " AND created <=" + current_day + " ORDER BY priority DESC, updated DESC"
+    # Current IOS issue jql
+    IOS_Query           = "project = QA AND issuetype = '오류 / 버그' AND component = IOS AND created >=" + yester_day + " AND created <=" + current_day + " ORDER BY priority DESC, updated DESC"
+    # Current NOT IOS/ AOS jql
+    NOT_Query           = "project = QA AND issuetype = '오류 / 버그' AND component not in (AOS, IOS) AND created >=" + yester_day + " AND created <=" + current_day + " ORDER BY priority DESC, updated DESC"
 
-# search jira function
-def serach_jira(JSQL_Data):
-
-    temp_list = []
-    
-    Query = JSQL_Data
-
-    length = len(Query)
-
-    for search_query in Query:
-        
-        # View current all issue list #
-        Current_Search_Result = jira.search_issues(search_query)
-
-    temp_list.append(Current_Search_Result)
+    temp_list           = [All_Query, AOS_Query, IOS_Query, NOT_Query]
 
     return temp_list
 
-# slack alarm
+# View Check Data
+def view_Check_data(Data):
+    slack_alarm(Data)
+
+# Slack alarm
 def slack_alarm(Result):
 
-    # total_Result =   []
-    # AOS_Result   =   []
-    # IOS_Result   =   []
-    # NOT_Result   =   []
-    
-    if not Result:
-        Result_length = len(Result)
-        slack.chat.post_message('#python_alarmtest', '총 등록건수 는' +Result_length() + '입니다.')
+    # my slack Token
+    slack_Token        = '슬랙 접근 Token api'
+    slack channel, # channel setting '#channel'
+    slack = Slacker(slack_Token)
 
-        for listing in Result:
-            slack.chat.post_message('#python_alarmtest', listing ,listing.fields.summary)
+    # Current filter number
+    count = len(Result)
+    print(count)
+    slack.chat.post_message('#python_alarmtest', '금일 이슈 등록건수 는' + count + '입니다.')
 
-        #slack.chat.post_message('#python_alarmtest', 'AOS 는')
-        #slack.chat.post_message('#python_alarmtest', 'IOS 는')
-        #slack.chat.post_message('#python_alarmtest', '그 밖에는')
+    # Current register filter informtaion
+    for r_data in Result:
+        print(r_data.fields.summary)
+        slack.chat.post_message('#python_alarmtest', '금일 이슈 등록건수 는' + count + '입니다.')
 
-    else:
-        slack.chat.post_message('python_alarmtest', '오늘 이슈로 등록된 것이 한 건도 없습니다')
+# Main Start
+if __name__ == '__main__':
 
-#=========================================================================================================
+    C_Num = 0
+    Data = jira_Conn_Search()
 
-# Step1. call select_Date Function
-JSQL_Data = select_Data()
-
-# Step2. call search_jira Function
-Result =serach_jira(JSQL_Data)
-
-# Step3. call slack alarm
-slack_alarm(Result)
-
-#=========================================================================================================
+    while C_Num in range(0, len(Data)):
+        view_Check_data(Data[C_Num])
+        C_Num = C_Num + 1
