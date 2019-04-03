@@ -12,19 +12,12 @@
 - slack, mail 등을 이용한 알람 메시지 연동기능 추가 예정
 - 코드 고도화
 
-(외부 모듈)
-
-- JIRA : JIRA 접근 및 JQL을 사용하기 위한 모듈
- : [설치방법 : pip install JIRA or pycharm plugin을 통한 검색 후 적용]
-- Slacker : slack 알림을 사용하기 위한 모듈
-: [설치방법 : pip install slacker or pycharm plugin을 통함 검색 후 적용
-
 [Updated : 2019년 4월 3일]
 
 - main 함수 관련 위치수정 및 변수관련 내용 부분 수정
 - 지라 접근 관련 try catch 구문 입력
 - 쿼리 구문 고도화 및 각 항목별 parsing 을 통한 이슈값 내용 정리
-- 각 검색결과에 따라 정확한 가시성을 줄 수 있는 방법 고려필요
+- 각 검색결과에 따라 정확한 가시성을 줄 수 있는 방법적용
 
 [최종 완성형]
 - 슬랙 Command를 이용한 질의문 보여주기 작업을 구상 (쳇봇과 같은 경우를 고려함)
