@@ -11,8 +11,8 @@ def jira_Conn_Search():
 
     # jira id/ pasword / server
     user                = 'jira ID'
-    apikey              = 'jira API Key'
-    server              = 'jira server
+    apikey              = 'jira PASSWD'
+    server              = 'jira SERVER'
 
     # issue & issue Count variable
     temp_list           = []
@@ -66,26 +66,27 @@ def select_Data():
     return temp_list
 
 # View Check Data
-def view_Check_data(Data):
-    slack_alarm(Data)
+def view_Check_data(Data, Num):
+    slack_alarm(Data, Num)
 
 # Slack alarm
-def slack_alarm(Result):
+def slack_alarm(Result, Num):
 
     # my slack Token
     slack_Token        = '슬랙 접근 Token api'
-    slack channel, # channel setting '#channel'
+    # input slack Token
     slack = Slacker(slack_Token)
 
     # Current filter number
+    # 0 : ALL, 1 : AOS, 2 : IOS , 3 : NOT
+    Issue_Component = ['ALL', 'AOS', 'IOS', 'Etc']
+
     count = len(Result)
-    print(count)
-    slack.chat.post_message('#python_alarmtest', '금일 이슈 등록건수 는' + count + '입니다.')
+    slack.chat.post_message('#python_alarmtest', Issue_Component + '이슈 등록건수 는' + count + '입니다.')
 
     # Current register filter informtaion
     for r_data in Result:
-        print(r_data.fields.summary)
-        slack.chat.post_message('#python_alarmtest', '금일 이슈 등록건수 는' + count + '입니다.')
+        slack.chat.post_message('#python_alarmtest', r_data.fields.summary)
 
 # Main Start
 if __name__ == '__main__':
@@ -94,5 +95,5 @@ if __name__ == '__main__':
     Data = jira_Conn_Search()
 
     while C_Num in range(0, len(Data)):
-        view_Check_data(Data[C_Num])
+        view_Check_data(Data[C_Num], C_Num)
         C_Num = C_Num + 1
